@@ -4,6 +4,7 @@ import 'package:demo_app/pages/auth_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:weather/weather.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -15,8 +16,17 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   var latitude;
   var longitude;
+  late String place;
+  late String weather;
+  late String tempmax;
+  late String tempmin;
+
+  bool showloading = false;
 
   getLocation() async {
+    setState(() {
+      showloading = true;
+    });
     bool serviceEnabled;
     LocationPermission permission;
 
@@ -44,6 +54,16 @@ class _HomePageState extends State<HomePage> {
     longitude = position.longitude;
     print(latitude);
     print(longitude);
+    WeatherFactory wf = WeatherFactory("ec07fb4219544f607cb849b87636b473");
+    Weather w = await wf.currentWeatherByLocation(latitude, longitude);
+    print(w);
+    place = w.areaName!;
+    weather = w.weatherDescription!;
+    tempmax = w.tempMax.toString();
+    tempmin = w.tempMin.toString();
+    setState(() {
+      showloading = false;
+    });
   }
 
   @override
@@ -57,8 +77,39 @@ class _HomePageState extends State<HomePage> {
 
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: Text("home"),
+      body: Container(
+        padding: EdgeInsets.all(0),
+        color: Colors.black,
+        child: showloading
+            ? Center(child: CircularProgressIndicator())
+            : Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(
+                      place,
+                      style: TextStyle(
+                          color: Colors.white.withOpacity(0.7), fontSize: 23),
+                    ),
+                    Text(
+                      tempmax,
+                      style: TextStyle(
+                          color: Colors.white.withOpacity(0.7), fontSize: 23),
+                    ),
+                    Text(
+                      tempmin,
+                      style: TextStyle(
+                          color: Colors.white.withOpacity(0.7), fontSize: 23),
+                    ),
+                    Text(
+                      weather,
+                      style: TextStyle(
+                          color: Colors.white.withOpacity(0.7), fontSize: 23),
+                    )
+                  ],
+                ),
+              ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {

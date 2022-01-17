@@ -23,7 +23,7 @@ class MyApp extends StatelessWidget {
       //         displayColor: Colors.white.withOpacity(0.7),
       //       ),
       // ),
-      home: HomePage(),
+      home: AuthPage(),
     );
   }
 }
